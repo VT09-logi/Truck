@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trucking Management System</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* --- LOGIN PAGE STYLING --- */
+        #loginPage {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-wrapper {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 420px;
+            border-top: 5px solid #0066cc;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h2 {
+            color: #0066cc;
+            font-size: 26px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: none;
+            border: 1px solid #f5c6cb;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #444;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: #0066cc;
+            box-shadow: 0 0 5px rgba(0, 102, 204, 0.2);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 13px;
+            background: #0066cc;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-login:hover { background: #0052a3; }
+
+        /* --- MAIN TRACKER STYLING --- */
+        #trackerPage {
+            display: none;
+            padding: 20px;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h2, h3 { color: #333; margin-bottom: 15px; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group-track {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group-track label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .form-group-track input, .form-group-track select {
+            padding: 8px 10px;
+            font-size: 13px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+            background-color: #fff;
+        }
+
+        .controls-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .search-box {
+            padding: 9px 12px;
+            font-size: 13px;
+            border: 2px solid #0066cc;
+            border-radius: 4px;
+            width: 320px;
+            outline: none;
+        }
+
+        .action-buttons { display: flex; gap: 10px; }
+
+        .btn {
+            border: none;
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: white;
+        }
+
+        .btn-save { background-color: #28a745; width: 100%; max-width: 200px; }
+        .btn-save:hover { background-color: #218838; }
+        .btn-excel { background-color: #1f7246; }
+        .btn-print { background-color: #17a2b8; }
+        .btn-logout { background-color: #6c757d; }
+        .btn-delete { background-color: #dc3545; padding: 5px 8px; font-size: 11px; }
+
+        .table-responsive { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; min-width: 2600px; }
+        th { background-color: #0066cc; color: white; padding: 12px 8px; font-weight: 600; }
+        td { padding: 10px 8px; border-bottom: 1px solid #ddd; }
+        tr:hover { background-color: #f9f9f9; }
+
+        table input, table select { border: none; background: transparent; width: 100%; font-size: 12px; color: #333; }
+        table input:focus, table select:focus { outline: 1px solid #0066cc; background: #fff; padding: 4px; }
+
+        .standby-active { background-color: #fff3cd !important; color: #856404; font-weight: bold; }
+        .read-only { background-color: #e9ecef; font-weight: bold; text-align: center; }
+
+        @media print {
+            .no-print, .form-container, .search-box, th.no-print, td.no-print { display: none !important; }
+            body { padding: 0; background: white; }
+            table { min-width: 100%; font-size: 8px; }
+            .read-only { background: transparent; border: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loginPage">
+    <div class="login-wrapper">
+        <div class="login-header">
+            <h2>Trucking System Login</h2>
+            <p>Please enter credentials to access database</p>
+        </div>
+        
+        <div id="errorAlert" class="error-message">Invalid Username or Password!</div>
+        
+        <form onsubmit="validateLogin(event)">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" class="btn-login">Sign In</button>
+        </form>
+    </div>
+</div>
+
+<div id="trackerPage">
+    <div class="container form-container no-print">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3>Add New Trucking Record</h3>
+            <button class="btn btn-logout" onclick="logout()">Logout</button>
+        </div>
+        <form id="recordForm" onsubmit="handleFormSubmit(event)">
+            <div class="form-grid">
+                <div class="form-group-track"><label>Truck No</label><input type="text" id="f_truckNo" required></div>
+                <div class="form-group-track"><label>Continue No</label><input type="text" id="f_continueNo"></div>
+                <div class="form-group-track"><label>Custom No</label><input type="text" id="f_customNo"></div>
+                <div class="form-group-track">
+                    <label>Size</label>
+                    <select id="f_size" required>
+                        <option value="" disabled selected>-- Select Size --</option>
+                        <option value="20' GP">20' Standard (GP)</option>
+                        <option value="20' HC">20' High Cube (HC)</option>
+                        <option value="20' RF">20' Reefer (RF)</option>
+                        <option value="40' GP">40' Standard (GP)</option>
+                        <option value="40' HC">40' High Cube (HC)</option>
+                        <option value="40' RF">40' Reefer (RF)</option>
+                        <option value="45' HC">45' High Cube (HC)</option>
+                        <option value="ALL SIZE">ALL SIZE / OTHER</option>
+                    </select>
+                </div>
+                <div class="form-group-track"><label>Company Name</label><input type="text" id="f_companyName"></div>
+                <div class="form-group-track"><label>Map / Destination</label><input type="text" id="f_map"></div>
+                <div class="form-group-track"><label>Driver ID</label><input type="text" id="f_driverId"></div>
+                <div class="form-group-track"><label>Driver Name</label><input type="text" id="f_driverName" required></div>
+                <div class="form-group-track"><label>Driver TELL</label><input type="text" id="f_driverTell"></div>
+                <div class="form-group-track"><label>Gross Weight (Kgs)</label><input type="number" id="f_grossWeight"></div>
+                <div class="form-group-track"><label>Net Weight (Kgs)</label><input type="number" id="f_netWeight"></div>
+                <div class="form-group-track"><label>Date Pickup</label><input type="date" id="f_dateIn" required value="2026-05-19"></div>
+                <div class="form-group-track"><label>Get In Time</label><input type="time" id="f_timeIn" required value="08:00"></div>
+                <div class="form-group-track"><label>Date Ending</label><input type="date" id="f_dateOut" required value="2026-05-19"></div>
+                <div class="form-group-track"><label>Get Out Time</label><input type="time" id="f_timeOut" required value="17:00"></div>
+                <div class="form-group-track"><label>Amount ($)</label><input type="number" id="f_amount" value="0" step="0.01"></div>
+                <div class="form-group-track"><label>Extra ($)</label><input type="number" id="f_extra" value="0" step="0.01"></div>
+                <div class="form-group-track"><label>Overnight ($)</label><input type="number" id="f_overnight" value="0" step="0.01"></div>
+                <div class="form-group-track"><label>Expressway ($)</label><input type="number" id="f_expressway" value="0" step="0.01"></div>
+                <div class="form-group-track"><label>Empty ($)</label><input type="number" id="f_empty" value="0" step="0.01"></div>
+            </div>
+            <button type="submit" class="btn btn-save">Save Record</button>
+        </form>
+    </div>
+
+    <div class="container" id="pdfContent">
+        <div class="header-section">
+            <h2>Trucking Log Database</h2>
+            <div class="controls-wrapper">
+                <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 Search (Truck No, Driver, Size, Company)...">
+                <div class="action-buttons no-print">
+                    <button class="btn btn-excel" onclick="exportToCSV()">📊 Excel (CSV)</button>
+                    <button class="btn btn-print" onclick="window.print()">🖨️ Print / PDF</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table id="trackerTable">
+                <thead>
+                    <tr>
+                        <th class="no-print">Actions</th>
+                        <th>No</th>
+                        <th>Truck No</th>
+                        <th>Continue No</th>
+                        <th>Custom No</th>
+                        <th>Size</th>
+                        <th>Company Name</th>
+                        <th>Map</th>
+                        <th>Driver ID</th>
+                        <th>Driver Name</th>
+                        <th>Driver TELL</th>
+                        <th>Gross Weight (Kgs)</th>
+                        <th>Net Weight (Kgs)</th>
+                        <th>Date Pickup</th>
+                        <th>Get In Time</th>
+                        <th>Date Ending</th>
+                        <th>Get Out Time</th>
+                        <th>Duration (Hours)</th>
+                        <th>Amount ($)</th>
+                        <th>Extra ($)</th>
+                        <th>Standby ($)</th>
+                        <th>Overnight ($)</th>
+                        <th>Expressway ($)</th>
+                        <th>Empty ($)</th>
+                        <th>Total amount ($)</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// --- LOGIN CORE LOGIC ---
+function validateLogin(event) {
+    event.preventDefault();
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    const alertBox = document.getElementById('errorAlert');
+
+    if (user === "admin" && pass === "truck123") {
+        alertBox.style.display = "none";
+        document.getElementById('loginPage').style.display = "none";
+        document.getElementById('trackerPage').style.display = "block";
+        loadData();
+    } else {
+        alertBox.style.display = "block";
+    }
+}
+
+function logout() {
+    document.getElementById('password').value = "";
+    document.getElementById('trackerPage').style.display = "none";
+    document.getElementById('loginPage').style.display = "flex";
+}
+
+// --- TRACKER CORE LOGIC ---
+const containerSizes = ["20' GP", "20' HC", "20' RF", "40' GP", "40' HC", "40' RF", "45' HC", "ALL SIZE"];
+
+function handleFormSubmit(event) {
+    event.preventDefault();
+    const newRecord = {
+        truckNo: document.getElementById('f_truckNo').value,
+        continueNo: document.getElementById('f_continueNo').value,
+        customNo: document.getElementById('f_customNo').value,
+        size: document.getElementById('f_size').value,
+        companyName: document.getElementById('f_companyName').value,
+        map: document.getElementById('f_map').value,
+        driverId: document.getElementById('f_driverId').value,
+        driverName: document.getElementById('f_driverName').value,
+        driverTell: document.getElementById('f_driverTell').value,
+        grossWeight: document.getElementById('f_grossWeight').value,
+        netWeight: document.getElementById('f_netWeight').value,
+        dateIn: document.getElementById('f_dateIn').value,
+        timeIn: document.getElementById('f_timeIn').value,
+        dateOut: document.getElementById('f_dateOut').value,
+        timeOut: document.getElementById('f_timeOut').value,
+        amount: document.getElementById('f_amount').value,
+        extra: document.getElementById('f_extra').value,
+        overnight: document.getElementById('f_overnight').value,
+        expressway: document.getElementById('f_expressway').value,
+        empty: document.getElementById('f_empty').value
+    };
+
+    const currentData = JSON.parse(localStorage.getItem("truckingTrackerData")) || [];
+    currentData.push(newRecord);
+    try {
+        localStorage.setItem("truckingTrackerData", JSON.stringify(currentData));
+    } catch(e) {
+        alert("Storage error.");
+    }
+    document.getElementById('recordForm').reset();
+    
+    document.getElementById('f_dateIn').value = '2026-05-19';
+    document.getElementById('f_dateOut').value = '2026-05-19';
+    document.getElementById('f_timeIn').value = '08:00';
+    document.getElementById('f_timeOut').value = '17:00';
+    
+    loadData();
+}
+
+function calculateRow(row) {
+    const dateIn = row.querySelector('.date-in-val').value;
+    const timeIn = row.querySelector('.get-in-val').value;
+    const dateOut = row.querySelector('.date-out-val').value;
+    const timeOut = row.querySelector('.get-out-val').value;
+
+    if (dateIn && timeIn && dateOut && timeOut) {
+        const diffHours = (new Date(`${dateOut}T${timeOut}`) - new Date(`${dateIn}T${timeIn}`)) / (1000 * 60 * 60);
+        if (diffHours >= 0) {
+            row.querySelector('.duration').innerText = diffHours.toFixed(1) + " h";
+            let standby = diffHours > 24 ? Math.ceil((diffHours - 24) / 24) * 50 : 0;
+            row.querySelector('.standby').innerText = standby;
+            if (standby > 0) row.querySelector('.standby').classList.add('standby-active');
+            else row.querySelector('.standby').classList.remove('standby-active');
+        } else {
+            row.querySelector('.duration').innerText = "0.0 h";
+            row.querySelector('.standby').innerText = "0";
+            row.querySelector('.standby').classList.remove('standby-active');
+        }
+    }
+    const amt = parseFloat(row.querySelector('.amount-val').value) || 0;
+    const ext = parseFloat(row.querySelector('.extra-val').value) || 0;
+    const std = parseFloat(row.querySelector('.standby').innerText) || 0;
+    const ovn = parseFloat(row.querySelector('.overnight-val').value) || 0;
+    const exp = parseFloat(row.querySelector('.expressway-val').value) || 0;
+    const emp = parseFloat(row.querySelector('.empty-val').value) || 0;
+    row.querySelector('.total-amount').innerText = "$" + (amt + ext + std + ovn + exp + emp).toFixed(2);
+}
+
+function inlineUpdate(el) {
+    calculateRow(el.closest('.row-data'));
+    saveAllInlineData();
+}
+
+function createRowHTML(data, index) {
+    let options = `<option value="" disabled>Select Size</option>`;
+    containerSizes.forEach(s => options += `<option value="${s}" ${data.size===s?'selected':''}>${s}</option>`);
+    return `
+        <td class="no-print"><button class="btn btn-delete" onclick="deleteRow(${index})">Edit / Delete</button></td>
+        <td class="row-index">${index + 1}</td>
+        <td><input type="text" class="truck-no-val" value="${data.truckNo||''}" oninput="inlineUpdate(this)"></td>
+        <td><input type="text" class="continue-no-val" value="${data.continueNo||''}" oninput="inlineUpdate(this)"></td>
+        <td><input type="text" class="custom-no-val" value="${data.customNo||''}" oninput="inlineUpdate(this)"></td>
+        <td><select class="size-val" onchange="inlineUpdate(this)">${options}</select></td>
+        <td><input type="text" class="company-name-val" value="${data.companyName||''}" oninput="inlineUpdate(this)"></td>
+        <td><input type="text" class="map-val" value="${data.map||''}" oninput="inlineUpdate(this)"></td>
+        <td><input type="text" class="driver-id-val" value="${data.driverId||''}" oninput="inlineUpdate(this)"></td>
+        <td><input type="text" class="driver-name-val" value="${data.driverName||''}" oninput="inlineUpdate(this)"></td>
+        <td><input type="text" class="driver-tell-val" value="${data.driverTell||''}" oninput="inlineUpdate(this)"></td>
+        <td><input type="number" class="gross-weight-val" value="${data.grossWeight||''}" oninput="inlineUpdate(this)"></td>
+        <td><input type="number" class="net-weight-val" value="${data.netWeight||''}" oninput="inlineUpdate(this)"></td>
+        <td><input type="date" class="date-in-val" value="${data.dateIn}" onchange="inlineUpdate(this)"></td>
+        <td><input type="time" class="get-in-val" value="${data.timeIn}" onchange="inlineUpdate(this)"></td>
+        <td><input type="date" class="date-out-val" value="${data.dateOut}" onchange="inlineUpdate(this)"></td>
+        <td><input type="time" class="get-out-val" value="${data.timeOut}" onchange="inlineUpdate(this)"></td>
+        <td class="duration read-only">0</td>
+        <td><input type="number" class="amount-val" value="${data.amount||'0'}" oninput="inlineUpdate(this)"></td>
+        <td><input type="number" class="extra-val" value="${data.extra||'0'}" oninput="inlineUpdate(this)"></td>
+        <td class="standby read-only">0</td>
+        <td><input type="number" class="overnight-val" value="${data.overnight||'0'}" oninput="inlineUpdate(this)"></td>
+        <td><input type="number" class="expressway-val" value="${data.expressway||'0'}" oninput="inlineUpdate(this)"></td>
+        <td><input type="number" class="empty-val" value="${data.empty||'0'}" oninput="inlineUpdate(this)"></td>
+        <td class="total-amount read-only">$0.00</td>
+    `;
+}
+
+function searchData() {
+    const filter = document.getElementById("searchInput").value.toUpperCase();
+    document.querySelectorAll("#tableBody .row-data").forEach(row => {
+        const truckNo = row.querySelector(".truck-no-val")?.value || "";
+        const driverName = row.querySelector(".driver-name-val")?.value || "";
+        const companyName = row.querySelector(".company-name-val")?.value || "";
+        const text = truckNo + driverName + companyName;
+        row.style.display = text.toUpperCase().includes(filter) ? "" : "none";
+    });
+}
+
+function deleteRow(index) {
+    if(confirm("Are you sure you want to delete this row permanently?")) {
+        const data = JSON.parse(localStorage.getItem("truckingTrackerData")) || [];
+        data.splice(index, 1);
+        localStorage.setItem("truckingTrackerData", JSON.stringify(data));
+        loadData();
+    }
+}
+
+function saveAllInlineData() {
+    const rowsData = [];
+    document.querySelectorAll('.row-data').forEach(row => {
+        rowsData.push({
+            truckNo: row.querySelector('.truck-no-val').value, 
+            continueNo: row.querySelector('.continue-no-val').value,
+            customNo: row.querySelector('.custom-no-val').value, 
+            size: row.querySelector('.size-val').value,
+            companyName: row.querySelector('.company-name-val').value, 
+            map: row.querySelector('.map-val').value,
+            driverId: row.querySelector('.driver-id-val').value, 
+            driverName: row.querySelector('.driver-name-val').value,
+            driverTell: row.querySelector('.driver-tell-val').value, 
+            grossWeight: row.querySelector('.gross-weight-val').value,
+            netWeight: row.querySelector('.net-weight-val').value, 
+            dateIn: row.querySelector('.date-in-val').value,
+            timeIn: row.querySelector('.get-in-val').value, 
+            dateOut: row.querySelector('.date-out-val').value,
+            timeOut: row.querySelector('.get-out-val').value, 
+            amount: row.querySelector('.amount-val').value,
+            extra: row.querySelector('.extra-val').value, 
+            overnight: row.querySelector('.overnight-val').value,
+            expressway: row.querySelector('.expressway-val').value, 
+            empty: row.querySelector('.empty-val').value
+        });
+    });
+    localStorage.setItem("truckingTrackerData", JSON.stringify(rowsData));
+}
+
+function loadData() {
+    const tableBody = document.getElementById('tableBody');
+    tableBody.innerHTML = "";
+    const savedData = localStorage.getItem("truckingTrackerData");
+    if (savedData) {
+        JSON.parse(savedData).forEach((data, index) => {
+            const row = document.createElement('tr');
+            row.className = 'row-data';
+            row.innerHTML = createRowHTML(data, index);
+            tableBody.appendChild(row);
+            calculateRow(row);
+        });
+    }
+}
+
+function exportToCSV() {
+    const table = document.getElementById("trackerTable");
+    let csvRows = [];
+    
+    let headers = ["No", "Truck No", "Continue No", "Custom No", "Size", "Company Name", "Map", "Driver ID", "Driver Name", "Driver TELL", "Gross Weight", "Net Weight", "Date Pickup", "Get In Time", "Date Ending", "Get Out Time", "Duration", "Amount", "Extra", "Standby", "Overnight", "Expressway", "Empty", "Total Amount"];
+    csvRows.push(headers.join(","));
+
+    table.querySelectorAll("tbody tr").forEach(row => {
+        if (row.style.display !== "none") {
+            let cols = [
+                row.querySelector(".row-index").innerText, 
+                `"${row.querySelector(".truck-no-val").value}"`, 
+                `"${row.querySelector(".continue-no-val").value}"`,
+                `"${row.querySelector(".custom-no-val").value}"`, 
+                `"${row.querySelector(".size-val").value}"`, 
+                `"${row.querySelector(".company-name-val").value}"`,
+                `"${row.querySelector(".map-val").value}"`, 
+                `"${row.querySelector(".driver-id-val").value}"`, 
+                `"${row.querySelector(".driver-name-val").value}"`,
+                `"${row.querySelector(".driver-tell-val").value}"`, 
+                row.querySelector(".gross-weight-val").value, 
+                row.querySelector(".net-weight-val").value,
+                row.querySelector(".date-in-val").value, 
+                row.querySelector(".get-in-val").value, 
+                row.querySelector(".date-out-val").value,
+                row.querySelector(".get-out-val").value, 
+                `"${row.querySelector(".duration").innerText}"`, 
+                row.querySelector(".amount-val").value,
+                row.querySelector(".extra-val").value, 
+                row.querySelector(".standby").innerText, 
+                row.querySelector(".overnight-val").value,
+                row.querySelector(".expressway-val").value, 
+                row.querySelector(".empty-val").value, 
+                `"${row.querySelector(".total-amount").innerText}"`
+            ];
+            csvRows.push(cols.join(","));
+        }
+    });
+
+    let csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csvRows.join("\n");
+    let encodedUri = encodeURI(csvContent);
+    let link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "Trucking_Report.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+</body>
+</html>
